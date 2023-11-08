@@ -12,7 +12,18 @@
 
 # Simple linear regression on California Housing
 library(tidyverse)
+library(ggplot2)
+install.packages(c("cowplot", "googleway", "ggplot2", "ggrepel", 
+                   "ggspatial", "libwgeom", "sf", "rnaturalearth", "rnaturalearthdata"))
+install.packages(c("mapview"))
 ds =read.csv('housing.csv')
+library(sf)
+install.packages(c("maps"))
+library(mapview)
+library("maps")
+library("rnaturalearth")
+library("rnaturalearthdata")
+
 length(ds)
 names(ds)
 head(ds)
@@ -142,6 +153,34 @@ saved1=data.frame(test_set1$median_income, y_pred)
 head(saved1)
 summary(ds[sapply(ds,is.numeric)])
 
+#plot ocean proximity using long and lat
+world <- ne_countries(scale = "medium", returnclass = "sf")
+class(world)
+maps::map()
+states <- st_as_sf(map("state", plot = FALSE, fill = TRUE))
+
+sites <- data.frame(longitude = c(--141.219120, -141.219155), latitude = c(30.009908, 30.009940))
+my_sf <- st_as_sf(ds, coords = c('longitude', 'latitude'))
+my_sf <- st_set_crs(my_sf,2227)
+
+ggplot(data = world) + 
+  geom_sf() + geom_sf(data = states, fill = NA)+ geom_sf(data=my_sf,fill=NA) + 
+  geom_point(data = ds, aes(x = longitude, y = latitude,color=ocean_proximity)) +
+  coord_sf(xlim = c(-125, -113), ylim = c(32, 43), expand = FALSE) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+#already used in the above code
+#my_sf <- st_as_sf(ds, coords = c('longitude', 'latitude'))
+#my_sf <- st_set_crs(my_sf,2227)
+#ggplot(my_sf) + 
+  #geom_sf(aes(color = ocean_proximity))
+
+#failed experiment, requires 1 conditional argument when ocean_proximity has >1
+#data = ds %>% 
+#  select('ocean_proximity', 'longitude', 'latitude')
+#glimpse(data)
+#mapview(data, xcol = "Longitude", ycol = "Latitude", crs = 2227, grid = FALSE)
+
 #plot the test results based on median house value
 ggplot()+geom_point(aes(x=test_set$total_rooms,y=test_set$median_house_value),color='darkgreen')+
   geom_line(aes(x=test_set$total_rooms,y=y_pred),color='darkred')+
@@ -173,4 +212,6 @@ ggplot()+geom_point(aes(x=test_set$total_bedrooms,y=test_set$median_house_value)
 ggplot()+geom_point(aes(x=test_set$population,y=test_set$median_house_value),color='darkgreen')+
   geom_line(aes(x=test_set$population,y=y_pred),color='darkred')+
   xlab('population')+ylab('median house value')
+
+# plot median income based on longitude and latitude
 
