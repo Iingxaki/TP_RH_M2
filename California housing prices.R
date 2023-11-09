@@ -197,6 +197,19 @@ ggplot()+geom_point(aes(x=test_set$population,y=test_set$median_house_value),col
   xlab('population')+ylab('median house value')
 
 # plot median house value based on longitude and latitude
+states <- st_as_sf(map("state", plot = FALSE, fill = TRUE))
+
+sites <- data.frame(longitude = c(--141.219120, -141.219155), latitude = c(30.009908, 30.009940))
+my_sf <- st_as_sf(ds, coords = c('longitude', 'latitude'))
+my_sf <- st_set_crs(my_sf,2227)
+
+options(scipen=999)
+
+ggplot(data = world) + 
+  geom_sf() + geom_sf(data = states, fill = NA)+ geom_sf(data=my_sf,fill=NA) + 
+  geom_point(data = ds, aes(x = longitude, y = latitude,color=median_house_value)) +
+  coord_sf(xlim = c(-125, -113), ylim = c(32, 43), expand = FALSE) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 #plot the test results based on median income
 ggplot()+geom_point(aes(x=test_set$total_rooms,y=test_set$median_house_value),color='darkgreen')+
@@ -214,4 +227,18 @@ ggplot()+geom_point(aes(x=test_set$population,y=test_set$median_house_value),col
   xlab('population')+ylab('median house value')
 
 # plot median income based on longitude and latitude
+states <- st_as_sf(map("state", plot = FALSE, fill = TRUE))
 
+sites <- data.frame(longitude = c(--141.219120, -141.219155), latitude = c(30.009908, 30.009940))
+my_sf <- st_as_sf(ds, coords = c('longitude', 'latitude'))
+my_sf <- st_set_crs(my_sf,2227)
+
+options(scipen=999)
+
+ggplot(data = world) + 
+  geom_sf() + geom_sf(data = states, fill = NA)+ geom_sf(data=my_sf,fill=NA) + 
+  geom_point(data = ds, aes(x = longitude, y = latitude,color=median_income)) +
+  coord_sf(xlim = c(-125, -113), ylim = c(32, 43), expand = FALSE) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+as.data.frame(table(ds$ocean_proximity))
